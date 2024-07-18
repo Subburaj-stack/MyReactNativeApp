@@ -6,56 +6,42 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { SafeAreaView, StatusBar, useColorScheme, View, Text, StyleSheet, Image } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
+import HomeScreen from './src/HomeScreen';
+import SurfingScreen from './src/SurfingScreen';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const Tab = createBottomTabNavigator();
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+// function HomeScreen() {
+//   return (
+//     <View style={styles.container}>
+//       <Text>Home Screen</Text>
+//     </View>
+//   );
+// }
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+
+
+function ProfileScreen() {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
+    <View style={styles.container}>
+      <Text>Profile Screen</Text>
     </View>
   );
 }
 
-function App(): React.JSX.Element {
+function NotificationsScreen() {
+  return (
+    <View style={styles.container}>
+      <Text>Notifications Screen</Text>
+    </View>
+  );
+}
+
+function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -63,55 +49,92 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
+    <SafeAreaView style={[backgroundStyle, { flex: 1 }]}>
+      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor={backgroundStyle.backgroundColor} />
+      <NavigationContainer>
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
+            tabBarIcon: ({ focused }) => {
+              let iconName;
+
+              if (route.name === 'Home') {
+                iconName = require('./assets/tab_home.png');
+              } else if (route.name === 'Surfing') {
+                iconName = require('./assets/tab_surfing.png');
+              } else if (route.name === 'Moula') {
+                iconName = require('./assets/tab_mula.png');
+              } else if (route.name === 'Vulcano') {
+                iconName = require('./assets/tab_vulcano.png');
+              }
+
+              return (
+                <Image
+                  source={iconName}
+                  style={[styles.icon, { tintColor: focused ? '#008080' : 'gray' }]}
+                />
+              );
+            },
+            tabBarActiveTintColor: '#008080',
+            tabBarInactiveTintColor: 'gray',
+            tabBarLabelStyle: {
+              fontSize: 10,
+              fontFamily: 'IBMPlexMono-Regular', // Apply custom font
+            },
+            tabBarStyle: {
+              backgroundColor: 'white',
+              borderTopWidth: 0,
+            },
+            tabBarItemStyle: {
+              position: 'relative',
+            },
+            tabBarIconStyle: {
+              marginBottom: -5,
+            },
+            tabBarLabel: ({ focused, color }) => (
+              <View style={styles.labelContainer}>
+                <Text style={{ color: focused ? '#008080' : 'gray', fontSize: 10, fontFamily: 'IBMPlexMono-Regular' }}>
+                  {route.name}
+                </Text>
+                {focused && <View style={styles.indicator} />}
+              </View>
+            ),
+            tabBarShowLabel: true, // This property controls whether the labels are shown or not
+          headerShown: false,
+          })}
+        >
+          <Tab.Screen name="Home" component={HomeScreen} />
+          <Tab.Screen name="Surfing" component={SurfingScreen} />
+          <Tab.Screen name="Moula" component={ProfileScreen} />
+          <Tab.Screen name="Vulcano" component={NotificationsScreen} />
+        </Tab.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white', // Set the background color to white for all screens
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  icon: {
+    width: 20, // Set the width of the icon
+    height: 20, // Set the height of the icon
+    resizeMode: 'contain', // Ensure the icon retains its aspect ratio
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  labelContainer: {
+    alignItems: 'center',
+    position: 'relative',
+    height: 20, // Ensure enough height to show the indicator below the label
   },
-  highlight: {
-    fontWeight: '700',
+  indicator: {
+    height: 3,
+    width: '100%',
+    backgroundColor: '#008080', // Ensure the color matches the selected color
+    position: 'absolute',
+    bottom: 0, // Adjust the position to ensure the indicator is visible
   },
 });
 
